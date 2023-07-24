@@ -20,7 +20,7 @@ Proxy extensions with ease.
 
 [Proxy-WASM](https://github.com/proxy-wasm/spec) (WebAssembly) is a powerful technology that enables
 you to extend the functionality of modern proxies like [Envoy](https://www.envoyproxy.io). using
-WebAssembly WASI modules. By writing Proxy-WASM modules, you can tell your L4/L7 proxy to inspect,
+WebAssembly (WASI) modules. By writing Proxy-WASM modules, you can tell your L4/L7 proxy to inspect,
 mutate, and route requests as they are passing through, all in a language-independent, sandboxed
 environment. It works with both HTTP and TCP-based connection and SDKs are available for Rust, Go,
 C++, and AssemblyScript (We're working on Javascript and Python).
@@ -65,8 +65,8 @@ docker run -p 8080:8080 -p 9901:9901 -p 9088:9088 -p 18000:18000 -v $HOME:/mnt d
 The above command mounts your home directory at `/mnt` inside the container so you can ingest local
 Proxy-WASM code (e.g. `/mnt/myprojects/myawesome-proxy-wasm-go/`). Adjust as needed.
 
-Mounted ports:
-* `8080` - Web UI (see below) and REST API at `:8080/v1/` (see defitnitions under `//api` folder).
+Bound ports:
+* `8080` - Web UI (see below) and REST API at `:8080/v1/` (see definitions under `//api` folder).
 * `9901` - Envoy admin endpoint/UI.
 * `9088` - Temporal UI (for easier build workflow debugging).
 * `18000` - Port of the Envoy listener - you can test your proxy configurations using `localhost:18000`.
@@ -82,11 +82,11 @@ engine for request routing and its WebAssembly (WASI) extension engine which use
 interop between Envoy and WASM runtime. The default runtime is [Chromium V8](https://v8.dev) but
 other runtimes such as [Wasmtime](https://wasmtime.dev),
 [Wamr](https://github.com/bytecodealliance/wasm-micro-runtime), and [WAVM](https://wavm.github.io/)
-can be swapped out.
+can be swapped in.
 
 The control plane server is a single Go binary that combines an Envoy control plane (using xDS
 protocol), a REST API server and associated CRUD logic, a React SPA served from Go, and a
-[Temporal](https://temporal.io) server (which is linked directly via an awesome
+[Temporal](https://temporal.io) server (which is linked directly via awesome
 [temporalite](https://github.com/temporalio/temporalite) library) for managing build workflows. The
 same binary also acts as Temporal worker and manages Envoy process.
 
@@ -94,7 +94,7 @@ Internal state is supported by an embedded SQLite instance which produces `sqlit
 disk. Temporal server has its own SQLite db file `temporalite.db`. Both of these need to be exported
 via Docker volume mount if you want state persisted across Docker runs.
 
-Compiled .wasm binaries are stored on local disk.
+Compiled `.wasm` binaries are stored on local disk.
 
 HTML/CSS/Javascript assets currently live on local filesystem but will be embedded in the binary
 itself in the future.
@@ -131,8 +131,8 @@ If you're interested in any of above features (or maybe something else), feel fr
 Patches Welcome! (no, really)
 
 Proximal is an open-source project, and we welcome contributions from the community. If you find
-bugs, want to request features, or wish to contribute code, please check out our [contribution
-guidelines](DEVELOPING.md) for detailed instructions.
+bugs, or wish to contribute code, please check out our [contribution guidelines](DEVELOPING.md) for
+detailed instructions.
 
 ### Support and Feedback
 
@@ -149,8 +149,10 @@ Proximal is released under the [Apache 2.0 License](LICENSE).
 ## Credits
 
 Proximal is developed and maintained by the Apoxy team. We want to thank the open-source community
-for their contributions and support in making this project possible. Special thanks go to: Envoy
-Proxy, Proxy-WASM, and Temporal teams.
+for their contributions and support in making this project possible. Special thanks go to: [Envoy
+Proxy](https://www.envoyproxy.io) community, [Proxy-WASM ABI and
+SDKs](https://github.com/proxy-wasm/spec) contributors, and fine folks at
+[Temporal](https://temporal.io).
 
 <br />
 <br />
