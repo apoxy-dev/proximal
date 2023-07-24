@@ -525,7 +525,7 @@ const ExtensionSettings = ({ extension, reload }) => {
   switch (extension.ingestParams.type) {
     case 'GITHUB':
       details['Repo'] = <Link href={extension.ingestParams.githubRepo} target="_blank" rel="noreferrer">{extension.ingestParams.githubRepo}</Link>;
-      if (details['Branch']) {
+      if (extension.ingestParams.branch) {
         details['Branch'] = extension.ingestParams.branch;
       } else {
         details['Commit'] = extension.ingestParams.commit;
