@@ -596,22 +596,12 @@ const ExtensionsTab = () => {
     };
   };
 
-  const onEndpoints = (middleware, endpoints) => {
-    middlewares.push(middleware);
-    setMiddlewares(middlewares);
-    setEndpoints(endpoints);
-    setActive(middleware.slug);
-    const tutorialComplete = !!localStorage.getItem('proximalTutorialComplete');
-    if (!tutorialComplete || endpoints?.length > 0) {
-      openPopup('endpoints')();
-    } else {
-      closePopup();
-    }
-  };
-
   let reloadTimeout = null;
 
   const load = async () => {
+    if (reloadTimeout) {
+      clearTimeout(reloadTimeout);
+    }
     let r = await Middleware.List();
     if (r.middlewares?.length > 0) {
       setMiddlewares(r.middlewares);
@@ -626,18 +616,37 @@ const ExtensionsTab = () => {
   };
   useEffect(() => {
     load();
-    return () => {
-      clearTimeout(reloadTimeout);
-    };
+    return () => clearTimeout(reloadTimeout);
   }, []);
 
   const reload = async () => {
     setLoading(true);
+    if (reloadTimeout) {
+      clearTimeout(reloadTimeout);
+    }
     await load();
   };
 
   const middlewareBySlug = (slug) => {
-    return middlewares.find(m => m.slug === slug);
+    let m = middlewares.find(m => m.slug === slug);
+    if (!m && middlewares.length > 0) {
+      return middlewares[0];
+    }
+    return m;
+  };
+
+  const onEndpoints = (middleware, endpoints) => {
+    middlewares.push(middleware);
+    setMiddlewares(middlewares);
+    setEndpoints(endpoints);
+    setActive(middleware.slug);
+    const tutorialComplete = !!localStorage.getItem('proximalTutorialComplete');
+    if (!tutorialComplete || endpoints?.length > 0) {
+      openPopup('endpoints')();
+    } else {
+      closePopup();
+    }
+    reload();
   };
 
   if (loading) {
