@@ -1,4 +1,4 @@
-load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
+WORKSPACEload("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive")
 
 http_archive(
     name = "io_bazel_rules_go",
@@ -3878,7 +3878,7 @@ container_pull(
     architecture = "arm64",
     registry = "docker.io",
     repository = "apoxy/proximal-builder",
-    tag = "cdbeee8f6a",
+    tag = "768d04e11d",
 )
 
 container_pull(
@@ -3886,5 +3886,5 @@ container_pull(
     architecture = "amd64",
     registry = "docker.io",
     repository = "apoxy/proximal-builder",
-    tag = "cdbeee8f6a",
+    tag = "768d04e11d",
 )

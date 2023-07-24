@@ -7,7 +7,7 @@ import (
 )
 
 type Builder struct {
-	cmd *exec.Cmd
+	modCmd, cmd *exec.Cmd
 }
 
 func NewBuilder() *Builder {
@@ -19,7 +19,28 @@ func (b *Builder) String() string {
 }
 
 func (b *Builder) Run(ctx context.Context, cwd, output string, args ...string) (stdout, stderr io.Reader, err error) {
-	defaultArgs := []string{
+	modArgs := []string{
+		"mod",
+		"download",
+	}
+	b.modCmd = exec.CommandContext(
+		ctx,
+		"go", modArgs...,
+	)
+	b.modCmd.Dir = cwd
+	modOut, err := b.modCmd.StdoutPipe()
+	if err != nil {
+		return nil, nil, err
+	}
+	modErr, err := b.modCmd.StderrPipe()
+	if err != nil {
+		return nil, nil, err
+	}
+	if err := b.modCmd.Start(); err != nil {
+		return nil, nil, err
+	}
+
+	buildArgs := []string{
 		"build",
 		"-o", output,
 		"-target", "wasi",
@@ -27,7 +48,7 @@ func (b *Builder) Run(ctx context.Context, cwd, output string, args ...string) (
 	}
 	b.cmd = exec.CommandContext(
 		ctx,
-		"tinygo", append(defaultArgs, args...)...,
+		"tinygo", append(buildArgs, args...)...,
 	)
 	b.cmd.Dir = cwd
 	stdout, err = b.cmd.StdoutPipe()
@@ -43,9 +64,12 @@ func (b *Builder) Run(ctx context.Context, cwd, output string, args ...string) (
 		return nil, nil, err
 	}
 
-	return stdout, stderr, nil
+	return io.MultiReader(modOut, stdout), io.MultiReader(modErr, stderr), nil
 }
 
 func (b *Builder) Wait(ctx context.Context) error {
+	if err := b.modCmd.Wait(); err != nil {
+		return err
+	}
 	return b.cmd.Wait()
 }
