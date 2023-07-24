@@ -1,0 +1,18 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "migrations",
+    srcs = ["migrations.go"],
+    embedsrcs = [
+        "00001_init.down.sql",
+        "00001_init.up.sql",
+        "00002_proxies.down.sql",
+        "00002_proxies.up.sql",
+        "00003_logs.up.sql",
+        "00003_logs.down.sql",
+        "00004_endpoints.down.sql",
+        "00004_endpoints.up.sql",
+    ],
+    importpath = "github.com/apoxy-dev/proximal/server/db/sql/migrations",
+    visibility = ["//visibility:public"],
+)

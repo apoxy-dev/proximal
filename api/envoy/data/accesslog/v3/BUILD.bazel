@@ -1,0 +1,16 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+# gazelle:go_generate_proto false
+
+proto_library(
+    name = "accesslogv3_proto",
+    srcs = ["accesslog.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/envoy/config/core/v3:corev3_proto",
+        "@com_google_protobuf//:any_proto",
+        "@com_google_protobuf//:duration_proto",
+        "@com_google_protobuf//:timestamp_proto",
+        "@com_google_protobuf//:wrappers_proto",
+    ],
+)

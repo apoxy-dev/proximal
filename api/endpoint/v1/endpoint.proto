@@ -1,0 +1,121 @@
+syntax = "proto3";
+
+package proximal.endpoints.v1;
+
+option go_package = "github.com/apoxy-dev/proximal/api/endpoint/v1;endpointv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message Healthcheck {
+ // TBD
+}
+
+message Address {
+  string host = 1;
+  int32 port = 2;
+}
+
+message EndpointStatus {
+  // Set to true if the endpoint is a domain name (e.g. example.com) as opposed
+  // to an IP address.
+  bool is_domain = 1;
+
+  // The details of the endpoint status.
+  string details = 2;
+}
+
+message Endpoint {
+  string cluster = 1;
+
+  bool default_upstream = 2;
+
+  EndpointStatus status = 3;
+
+  repeated Address addresses = 4;
+
+  enum DNSLookupFamily {
+    // Unspecified.
+    UNSPECIFIED = 0;
+    // Lookup first IPv4; if not available, lookup IPv6. (default)
+    V4_FIRST = 1;
+    // IPv4 only.
+    V4_ONLY = 2;
+    // V6 first; if not available, lookup IPv4.
+    V6_FIRST = 3;
+    // IPv6 only.
+    V6_ONLY = 4;
+  }
+  DNSLookupFamily dns_lookup_family = 5;
+
+  bool use_tls = 6;
+
+  Healthcheck healthcheck = 7;
+
+  google.protobuf.Timestamp created_at = 8;
+
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message CreateEndpointRequest {
+  Endpoint endpoint = 1;
+}
+
+message ListEndpointsRequest {
+  string page_token = 1;
+  int32 page_size = 2;
+}
+
+message ListEndpointsResponse {
+  repeated Endpoint endpoints = 1;
+  string next_page_token = 2;
+}
+
+message GetEndpointRequest {
+  string cluster = 1;
+}
+
+message UpdateEndpointRequest {
+  Endpoint endpoint = 1;
+}
+
+message DeleteEndpointRequest {
+  string cluster = 1;
+}
+
+service EndpointService {
+  rpc CreateEndpoint(CreateEndpointRequest) returns (Endpoint) {
+    option (google.api.http) = {
+      post: "/v1/endpoints"
+      body: "*"
+    };
+  }
+  rpc ListEndpoints(ListEndpointsRequest) returns (ListEndpointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/endpoints"
+    };
+  }
+  rpc GetEndpoint(GetEndpointRequest) returns (Endpoint) {
+    option (google.api.http) = {
+      get: "/v1/endpoints/{cluster}"
+    };
+  }
+  rpc UpdateEndpoint(UpdateEndpointRequest) returns (Endpoint) {
+    option (google.api.http) = {
+      put: "/v1/endpoints/{endpoint.cluster}"
+      body: "*"
+    };
+  }
+  rpc DeleteEndpoint(DeleteEndpointRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/endpoints/{cluster}"
+    };
+  }
+
+  rpc InternalListEndpoints(google.protobuf.Empty) returns (ListEndpointsResponse) {
+    option (google.api.http) = {
+      get: "/v1/internal/endpoints"
+    };
+  }
+}

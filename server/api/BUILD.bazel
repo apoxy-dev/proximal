@@ -1,0 +1,36 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "api",
+    srcs = [
+        "build.go",
+        "endpoint.go",
+        "logs.go",
+        "middleware.go",
+        "utils.go",
+    ],
+    importpath = "github.com/apoxy-dev/proximal/server/api",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/endpoint/v1:endpoint",
+        "//api/logs/v1:logs",
+        "//api/middleware/v1:middleware",
+        "//core/log",
+        "//server/db",
+        "//server/db/sql:sql_library",
+        "//server/ingest",
+        "//server/watcher",
+        "@com_github_envoyproxy_go_control_plane//envoy/data/accesslog/v3:accesslog",
+        "@com_github_envoyproxy_go_control_plane//envoy/service/accesslog/v3:accesslog",
+        "@com_github_gogo_status//:status",
+        "@com_github_google_uuid//:uuid",
+        "@io_bazel_rules_go//proto/wkt:empty_go_proto",
+        "@io_temporal_go_sdk//client",
+        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//codes",
+        "@org_golang_google_protobuf//encoding/protojson",
+        "@org_golang_google_protobuf//types/known/emptypb",
+        "@org_golang_google_protobuf//types/known/timestamppb",
+        "@org_golang_x_exp//maps",
+    ],
+)

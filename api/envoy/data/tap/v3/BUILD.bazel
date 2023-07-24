@@ -1,0 +1,13 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+# gazelle:go_generate_proto false
+
+proto_library(
+    name = "tapv3_proto",
+    srcs = [
+        "common.proto",
+        "http.proto",
+    ],
+    visibility = ["//visibility:public"],
+    deps = ["//api/envoy/config/core/v3:corev3_proto"],
+)

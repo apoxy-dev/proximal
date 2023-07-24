@@ -1,0 +1,3 @@
+WORKSPACE linguist-detectable=false
+*.bazel linguist-detectable=false
+frontend/build/** linguist-vendored

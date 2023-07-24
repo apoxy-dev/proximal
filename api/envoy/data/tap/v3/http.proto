@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package api.envoy.data.tap.v3;
+
+import "api/envoy/config/core/v3/base.proto";
+import "api/envoy/data/tap/v3/common.proto";
+
+option go_package = "github.com/envoyproxy/go-control-plane/envoy/data/tap/v3;tapv3";
+
+// A fully buffered HTTP trace message.
+message HttpBufferedTrace {
+  // HTTP message wrapper.
+  message Message {
+    // Message headers.
+    repeated config.core.v3.HeaderValue headers = 1;
+
+    // Message body.
+    Body body = 2;
+
+    // Message trailers.
+    repeated config.core.v3.HeaderValue trailers = 3;
+  }
+
+  // Request message.
+  Message request = 1;
+
+  // Response message.
+  Message response = 2;
+}
+
+// A streamed HTTP trace segment. Multiple segments make up a full trace.
+// [#next-free-field: 8]
+message HttpStreamedTraceSegment {
+  // Trace ID unique to the originating Envoy only. Trace IDs can repeat and should not be used
+  // for long term stable uniqueness.
+  uint64 trace_id = 1;
+
+  oneof message_piece {
+    // Request headers.
+    config.core.v3.HeaderMap request_headers = 2;
+
+    // Request body chunk.
+    Body request_body_chunk = 3;
+
+    // Request trailers.
+    config.core.v3.HeaderMap request_trailers = 4;
+
+    // Response headers.
+    config.core.v3.HeaderMap response_headers = 5;
+
+    // Response body chunk.
+    Body response_body_chunk = 6;
+
+    // Response trailers.
+    config.core.v3.HeaderMap response_trailers = 7;
+  }
+}

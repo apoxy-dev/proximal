@@ -1,0 +1,13 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "watcher",
+    srcs = ["watcher.go"],
+    importpath = "github.com/apoxy-dev/proximal/server/watcher",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/middleware/v1:middleware",
+        "//core/log",
+        "@com_github_fsnotify_fsnotify//:fsnotify",
+    ],
+)

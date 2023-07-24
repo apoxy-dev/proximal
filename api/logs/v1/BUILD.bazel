@@ -1,0 +1,44 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+load("@io_bazel_rules_go//proto:def.bzl", "go_proto_library")
+
+# gazelle:resolve proto proto envoy/data/tap/v3/http.proto //api/envoy/data/tap/v3:tapv3_proto
+# gazelle:resolve proto proto envoy/data/accesslog/v3/http.proto //api/envoy/data/accesslog/v3:accesslogv3_proto
+
+proto_library(
+    name = "logsv1_proto",
+    srcs = ["logs.proto"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/envoy/data/accesslog/v3:accesslogv3_proto",
+        "//api/envoy/data/tap/v3:tapv3_proto",
+        "@com_google_protobuf//:timestamp_proto",
+        "@go_googleapis//google/api:annotations_proto",
+    ],
+)
+
+# gazelle:resolve proto go api/envoy/data/tap/v3/http.proto @com_github_envoyproxy_go_control_plane//envoy/data/tap/v3:go_default_library
+# gazelle:resolve proto go api/envoy/data/accesslog/v3/accesslog.proto @com_github_envoyproxy_go_control_plane//envoy/data/accesslog/v3:go_default_library
+
+go_proto_library(
+    name = "logsv1_go_proto",
+    compilers = [
+        "@io_bazel_rules_go//proto:go_grpc",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//protoc-gen-grpc-gateway:go_gen_grpc_gateway",  # keep
+    ],
+    importpath = "github.com/apoxy-dev/proximal/api/logs/v1",
+    proto = ":logsv1_proto",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_envoyproxy_go_control_plane//envoy/data/accesslog/v3:go_default_library",
+        "@com_github_envoyproxy_go_control_plane//envoy/data/tap/v3:go_default_library",
+        "@go_googleapis//google/api:annotations_go_proto",
+    ],
+)
+
+go_library(
+    name = "logs",
+    embed = [":logsv1_go_proto"],
+    importpath = "github.com/apoxy-dev/proximal/api/logs/v1",
+    visibility = ["//visibility:public"],
+)

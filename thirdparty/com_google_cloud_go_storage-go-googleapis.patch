@@ -1,0 +1,30 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 7c4f9aa..7329fc7 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -43,8 +43,8 @@ go_library(
+         "@org_golang_google_api//storage/v1:storage",
+         "@org_golang_google_api//transport",
+         "@org_golang_google_api//transport/http",
+-        "@org_golang_google_genproto//googleapis/type/date",
+-        "@org_golang_google_genproto//googleapis/type/expr",
++        "@go_googleapis//google/type:date_go_proto",
++        "@go_googleapis//google/type:expr_go_proto",
+         "@org_golang_google_grpc//:grpc",
+         "@org_golang_google_grpc//codes",
+         "@org_golang_google_grpc//metadata",
+diff --git a/internal/apiv2/stubs/BUILD.bazel b/internal/apiv2/stubs/BUILD.bazel
+index 6c13822..452c705 100644
+--- a/internal/apiv2/stubs/BUILD.bazel
++++ b/internal/apiv2/stubs/BUILD.bazel
+@@ -7,8 +7,8 @@ go_library(
+     visibility = ["//:__subpackages__"],
+     deps = [
+         "@com_google_cloud_go_iam//apiv1/iampb",
+-        "@org_golang_google_genproto//googleapis/type/date",
+-        "@org_golang_google_genproto_googleapis_api//annotations",
++        "@go_googleapis//google/type:date_go_proto",
++        "@go_googleapis//google/api:annotations_go_proto",
+         "@org_golang_google_grpc//:grpc",
+         "@org_golang_google_grpc//codes",
+         "@org_golang_google_grpc//status",

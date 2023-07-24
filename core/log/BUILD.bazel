@@ -1,0 +1,9 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "log",
+    srcs = ["logger.go"],
+    importpath = "github.com/apoxy-dev/proximal/core/log",
+    visibility = ["//visibility:public"],
+    deps = ["@org_golang_x_exp//slog"],
+)

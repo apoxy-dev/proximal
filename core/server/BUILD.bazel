@@ -1,0 +1,17 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "server",
+    srcs = [
+        "middleware.go",
+        "server.go",
+    ],
+    importpath = "github.com/apoxy-dev/proximal/core/server",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_github_gogo_status//:status",
+        "@com_github_grpc_ecosystem_grpc_gateway_v2//runtime",
+        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//codes",
+    ],
+)

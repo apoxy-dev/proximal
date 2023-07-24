@@ -1,0 +1,18 @@
+diff --git a/server.go b/server.go
+index fa7387d..d0a185c 100644
+--- a/server.go
++++ b/server.go
+@@ -108,8 +108,12 @@ func NewServer(opts ...ServerOption) (*Server, error) {
+ 		serverOpts = append(serverOpts, c.UpstreamOptions...)
+ 	}
+ 
++	ss, err := temporal.NewServer(serverOpts...)
++	if err != nil {
++		return nil, err
++	}
+ 	s := &Server{
+-		internal:         temporal.NewServer(serverOpts...),
++		internal:         ss,
+ 		ui:               c.UIServer,
+ 		frontendHostPort: cfg.PublicClient.HostPort,
+ 		config:           c,

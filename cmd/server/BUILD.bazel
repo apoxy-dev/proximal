@@ -1,0 +1,59 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_binary", "go_library")
+load("@io_bazel_rules_docker//go:image.bzl", "go_image")
+
+go_library(
+    name = "server_lib",
+    srcs = [
+        "main.go",
+        "temporalite.go",
+    ],
+    data = [
+        "envoy-bootstrap.yaml",
+        "//frontend:build",
+    ],
+    importpath = "github.com/apoxy-dev/proximal/cmd/server",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//api/endpoint/v1:endpoint",
+        "//api/logs/v1:logs",
+        "//api/middleware/v1:middleware",
+        "//core/log",
+        "//core/server",
+        "//server/api",
+        "//server/db",
+        "//server/envoy",
+        "//server/ingest",
+        "//server/watcher",
+        "@com_github_temporalio_temporalite//:temporalite",
+        "@com_github_temporalio_ui_server_v2//server",
+        "@com_github_temporalio_ui_server_v2//server/config",
+        "@com_github_temporalio_ui_server_v2//server/server_options",
+        "@io_temporal_go_sdk//client",
+        "@io_temporal_go_sdk//worker",
+        "@io_temporal_go_server//common/config",
+        "@io_temporal_go_server//common/log/tag",
+        "@io_temporal_go_server//common/primitives",
+        "@io_temporal_go_server//temporal",
+        "@org_golang_google_grpc//:go_default_library",
+        "@org_golang_google_grpc//credentials/insecure",
+        "@org_golang_x_exp//slog",
+    ],
+)
+
+go_binary(
+    name = "server",
+    embed = [":server_lib"],
+    visibility = ["//visibility:public"],
+)
+
+go_image(
+    name = "image",
+    base = select({
+        "@platforms//cpu:arm64": "@base_image_arm64//image",
+        "@platforms//cpu:x86_64": "@base_image_amd64//image",
+    }),
+    embed = [":server_lib"],
+    # Workaround for https://github.com/bazelbuild/rules_go/issues/1706
+    env = {"GODEBUG": "netdns=go"},
+    importpath = "github.com/apoxy-dev/proximal/cmd/server",
+)

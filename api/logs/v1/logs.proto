@@ -1,0 +1,57 @@
+syntax = "proto3";
+
+package proximal.logs.v1;
+
+option go_package = "github.com/apoxy-dev/proximal/api/logs/v1;logsv1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// TODO(dilyevsky): So this was copy-pasted from envoyproxy/envoy repo. We should
+// vendor it properly using Bazel.
+import "api/envoy/data/tap/v3/http.proto";
+import "api/envoy/data/accesslog/v3/accesslog.proto";
+
+message GetLogsRequest {
+  google.protobuf.Timestamp start = 1;
+  google.protobuf.Timestamp end = 2;
+  string page_token = 3;
+  int32 page_size = 4;
+}
+
+message Log {
+  string id = 1;
+  google.protobuf.Timestamp timestamp = 2;
+  api.envoy.data.accesslog.v3.HTTPAccessLogEntry http = 3;
+}
+
+message GetLogsResponse {
+  repeated Log logs = 1;
+  string next_page_token = 2;
+}
+
+message GetFullLogRequest {
+  uint32 id = 1;
+}
+
+message FullLog {
+  uint32 id = 1;
+  api.envoy.data.tap.v3.HttpBufferedTrace message = 2;
+}
+
+message GetFullLogResponse {
+  FullLog log = 1;
+}
+
+service LogsService {
+  rpc GetLogs(GetLogsRequest) returns (GetLogsResponse) {
+    option (google.api.http) = {
+      get: "/v1/logs"
+    };
+  }
+  rpc GetFullLog(GetFullLogRequest) returns (FullLog) {
+    option (google.api.http) = {
+      get: "/v1/logs/{id}"
+    };
+  }
+}

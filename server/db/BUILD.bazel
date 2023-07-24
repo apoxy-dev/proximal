@@ -1,0 +1,22 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "db",
+    srcs = [
+        "conn.go",
+        "migrations.go",
+        "types.go",
+    ],
+    importpath = "github.com/apoxy-dev/proximal/server/db",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/middleware/v1:middleware",
+        "//core/log",
+        "//server/db/sql:sql_library",
+        "//server/db/sql/migrations",
+        "@com_github_golang_migrate_migrate_v4//:migrate",
+        "@com_github_golang_migrate_migrate_v4//database/sqlite3",
+        "@com_github_golang_migrate_migrate_v4//source/iofs",
+        "@com_github_mattn_go_sqlite3//:go-sqlite3",
+    ],
+)

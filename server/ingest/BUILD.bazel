@@ -1,0 +1,27 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "ingest",
+    srcs = ["worker.go"],
+    importpath = "github.com/apoxy-dev/proximal/server/ingest",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//api/middleware/v1:middleware",
+        "//server/build",
+        "//server/build/go",
+        "//server/build/rust",
+        "//server/db",
+        "//server/db/sql:sql_library",
+        "//server/watcher",
+        "@com_github_go_git_go_git_v5//:go-git",
+        "@com_github_go_git_go_git_v5//config",
+        "@com_github_go_git_go_git_v5//plumbing",
+        "@com_github_go_git_go_git_v5//storage/memory",
+        "@io_temporal_go_api//enums/v1:enums",
+        "@io_temporal_go_sdk//activity",
+        "@io_temporal_go_sdk//log",
+        "@io_temporal_go_sdk//temporal",
+        "@io_temporal_go_sdk//workflow",
+        "@org_golang_x_mod//sumdb/dirhash",
+    ],
+)

@@ -1,0 +1,22 @@
+load("@com_plezentek_rules_sqlc//sqlc:def.bzl", "sqlc_package")
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+sqlc_package(
+    name = "sql",
+    engine = "sqlite",
+    package = "sql",
+    queries = [
+        "middlewares.sql",
+        "logs.sql",
+        "endpoints.sql",
+    ],
+    schema = ["schema.sql"],
+    visibility = ["//visibility:public"],
+)
+
+go_library(
+    name = "sql_library",
+    srcs = [":sql"],
+    importpath = "github.com/apoxy-dev/proximal/server/db/sql",
+    visibility = ["//visibility:public"],
+)

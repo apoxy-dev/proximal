@@ -1,0 +1,17 @@
+load("@rules_proto//proto:defs.bzl", "proto_library")
+
+# gazelle:go_generate_proto false
+
+proto_library(
+    name = "corev3_proto",
+    srcs = [
+        "address.proto",
+        "base.proto",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+        "@com_google_protobuf//:struct_proto",
+        "@com_google_protobuf//:wrappers_proto",
+    ],
+)

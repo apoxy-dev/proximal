@@ -1,0 +1,267 @@
+syntax = "proto3";
+
+package proximal.middleware.v1;
+
+option go_package = "github.com/apoxy-dev/proximal/api/middleware/v1;middlewarev1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+message MiddlewareIngestParams {
+  enum MiddlewareIngestType {
+    UNKNOWN_INGEST_TYPE = 0;
+    DIRECT = 1;
+    GITHUB = 2;
+  }
+  MiddlewareIngestType type = 1;
+
+  // GitHub owner/repo for the GitHub source. Ignored for other types.
+  string github_repo = 2;
+
+  // Branch name for the GitHub source. Ignored for other types. Only one of commit or branch
+  // can be set.
+  string branch = 3;
+
+  // Commit for the GitHub source. Ignored for other types. Only one of commit or branch
+  // can be set.
+  string commit = 4;
+
+  // Directory to ingest from the direct source. Ignored for other types.
+  string watch_dir = 5;
+
+  enum MiddlewareLanguage {
+    UNKNOWN_LANGUAGE = 0;
+    GO = 1;
+    RUST = 2;
+  }
+  MiddlewareLanguage language = 6;
+
+  repeated string build_args = 7;
+}
+
+message MiddlewareRuntimeParams {
+  // config is the configuration for the middleware encoded as a string.
+  string config_string = 1;
+}
+
+message Middleware {
+  // MiddlewareType is the type of the middleware.
+  // Currently only PROXY_WASM is supported.
+  enum MiddlewareType {
+    PROXY_WASM = 0;
+  }
+  MiddlewareType type = 1;
+
+  // slug is the unique name of the middleware.
+  string slug = 2;
+
+  // ingest_params are the parameters for ingesting the middleware.
+  MiddlewareIngestParams ingest_params = 3;
+
+  // runtime_params are the parameters for running the middleware.
+  MiddlewareRuntimeParams runtime_params = 5;
+
+  // status is the status of the middleware.
+  enum MiddlewareStatus {
+    UNKNOWN = 0;
+    // PENDING means the middleware is being ingested.
+    PENDING = 1;
+    // READY means the middleware is ready to be used.
+    READY = 2;
+    // PENDING_READY means middleware is already gone to ready state and
+    // new build is in progress.
+    PENDING_READY = 3;
+    // ERRORED means the middleware failed to ingest.
+    ERRORED = 4;
+  }
+  MiddlewareStatus status = 6;
+
+  string live_build_sha = 7;
+
+  // created_at is the time the middleware was created. Ignored on create and update.
+  google.protobuf.Timestamp created_at = 8;
+
+  // updated_at is the time the middleware was updated. Ignored on create and update
+  // (updated automatically).
+  google.protobuf.Timestamp updated_at = 9;
+}
+
+message ListRequest {
+  // page_token is the token for the next page of middleware.
+  string page_token = 1;
+
+  // page_size is the number of middleware to return in a page.
+  int32 page_size = 2;
+}
+
+message ListResponse {
+  repeated Middleware middlewares = 1;
+
+  // next_page_token is the token for the next page of middleware.
+  string next_page_token = 2;
+}
+
+message GetRequest {
+  string slug = 1;
+}
+
+message CreateRequest {
+  Middleware middleware = 1;
+}
+
+message UpdateRequest {
+  Middleware middleware = 1;
+}
+
+message DeleteRequest {
+  string slug = 1;
+}
+
+message Build {
+  // For VCS-based sources sha of the commit used to build the middleware. For
+  // direct sources, we used the hash of the source directory (recursively hashing
+  // directory contents).
+  string sha = 1;
+
+  Middleware middleware = 2;
+
+  enum BuildStatus {
+    UNKNOWN = 0;
+    // PREPARING means the build is being prepared.
+    PREPARING = 1;
+    // RUNNING means the build is being built.
+    RUNNING = 2;
+    // READY means the build was successfully built.
+    READY = 3;
+    // ERRORED means the build failed to build.
+    ERRORED = 4;
+  }
+  BuildStatus status = 3;
+
+  string status_detail = 4;
+
+  // started_at is the time the build was started.
+  google.protobuf.Timestamp started_at = 6;
+
+  // updated_at is the time the build was updated.
+  // (updated automatically).
+  // If status is READY, this is the time the build was successfully built.
+  // If status is ERRORED, this is the time the build errored (last attempt).
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+message ListBuildsRequest {
+  string slug = 1;
+
+  // page_token is the token for the next page of builds.
+  string page_token = 2;
+
+  // page_size is the number of builds to return in a page.
+  int32 page_size = 3;
+}
+
+message ListBuildsResponse {
+  repeated Build builds = 1;
+
+  // next_page_token is the token for the next page of builds.
+  string next_page_token = 2;
+}
+
+message GetBuildRequest {
+  string slug = 1;
+  string sha = 2;
+}
+
+message GetLiveBuildRequest {
+  string slug = 1;
+}
+
+message TriggerBuildRequest {
+  string slug = 1;
+}
+
+message GetBuildOutputRequest {
+  string slug = 1;
+  string sha = 2;
+  string output_type = 3;
+}
+
+message GetLiveBuildOutputRequest {
+  string slug = 1;
+  string output_type = 2;
+}
+
+message BuildOutput {
+  Build build = 1;
+  bytes output = 2;
+}
+
+// MiddlewareService manages middleware lifecycle.
+service MiddlewareService {
+  rpc List(ListRequest) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/v1/middlewares"
+    };
+  }
+  rpc Get(GetRequest) returns (Middleware) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}"
+    };
+  }
+  rpc Create(CreateRequest) returns (Middleware) {
+    option (google.api.http) = {
+      post: "/v1/middlewares"
+      body: "*"
+    };
+  }
+
+  rpc Update(UpdateRequest) returns (Middleware) {
+    option (google.api.http) = {
+      put: "/v1/middlewares/{middleware.slug}"
+      body: "*"
+    };
+  }
+  rpc Delete(DeleteRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      delete: "/v1/middlewares/{slug}"
+    };
+  }
+  rpc TriggerBuild(TriggerBuildRequest) returns (google.protobuf.Empty) {
+    option (google.api.http) = {
+      post: "/v1/middlewares/{slug}/builds"
+      body: "*"
+    };
+  }
+  rpc ListBuilds(ListBuildsRequest) returns (ListBuildsResponse) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}/builds"
+    };
+  }
+  rpc GetBuild(GetBuildRequest) returns (Build) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}/builds/{sha}"
+    };
+  }
+  rpc GetLiveBuild(GetLiveBuildRequest) returns (Build) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}/builds/live"
+    };
+  }
+  rpc GetBuildOutput(GetBuildOutputRequest) returns (BuildOutput) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}/builds/{sha}/{output_type}"
+    };
+  }
+  rpc GetLiveBuildOutput(GetLiveBuildOutputRequest) returns (BuildOutput) {
+    option (google.api.http) = {
+      get: "/v1/middlewares/{slug}/builds/live/{output_type}"
+    };
+  }
+
+  rpc InternalList(google.protobuf.Empty) returns (ListResponse) {
+    option (google.api.http) = {
+      get: "/v1/internal/middlewares"
+    };
+  }
+}

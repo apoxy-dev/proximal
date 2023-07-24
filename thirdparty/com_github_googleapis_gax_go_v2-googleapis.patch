@@ -1,0 +1,50 @@
+diff --git a/BUILD.bazel b/BUILD.bazel
+index 0a5a76d..562debc 100644
+--- a/BUILD.bazel
++++ b/BUILD.bazel
+@@ -49,8 +49,8 @@ go_test(
+         "@com_github_google_go_cmp//cmp/cmpopts",
+         "@org_golang_google_api//googleapi",
+         "@org_golang_google_genproto//googleapis/longrunning",
+-        "@org_golang_google_genproto_googleapis_api//serviceconfig",
+-        "@org_golang_google_genproto_googleapis_rpc//errdetails",
++	"@go_googleapis//google/api:serviceconfig_go_proto",
++	"@go_googleapis//google/rpc:errdetails_go_proto",
+         "@org_golang_google_grpc//codes",
+         "@org_golang_google_grpc//status",
+         "@org_golang_google_protobuf//encoding/protojson",
+diff --git a/apierror/BUILD.bazel b/apierror/BUILD.bazel
+index 2b5664c..49ea981 100644
+--- a/apierror/BUILD.bazel
++++ b/apierror/BUILD.bazel
+@@ -9,7 +9,7 @@ go_library(
+     deps = [
+         "//apierror/internal/proto",
+         "@org_golang_google_api//googleapi",
+-        "@org_golang_google_genproto_googleapis_rpc//errdetails",
++	"@go_googleapis//google/rpc:errdetails_go_proto",
+         "@org_golang_google_grpc//codes",
+         "@org_golang_google_grpc//status",
+         "@org_golang_google_protobuf//encoding/protojson",
+@@ -33,7 +33,7 @@ go_test(
+         "@com_github_google_go_cmp//cmp",
+         "@com_github_google_go_cmp//cmp/cmpopts",
+         "@org_golang_google_api//googleapi",
+-        "@org_golang_google_genproto_googleapis_rpc//errdetails",
++	"@go_googleapis//google/rpc:errdetails_go_proto",
+         "@org_golang_google_grpc//codes",
+         "@org_golang_google_grpc//status",
+         "@org_golang_google_protobuf//encoding/protojson",
+diff --git a/apierror/internal/proto/BUILD.bazel b/apierror/internal/proto/BUILD.bazel
+index aa284c8..5613132 100644
+--- a/apierror/internal/proto/BUILD.bazel
++++ b/apierror/internal/proto/BUILD.bazel
+@@ -10,7 +10,7 @@ go_library(
+     importpath_aliases = ["github.com/googleapis/gax-go/apierror/internal/proto"],
+     visibility = ["//apierror:__subpackages__"],
+     deps = [
+-        "@org_golang_google_genproto_googleapis_rpc//code",
++	"@go_googleapis//google/rpc:code_go_proto",
+         "@org_golang_google_protobuf//reflect/protoreflect",
+         "@org_golang_google_protobuf//runtime/protoimpl",
+         "@org_golang_google_protobuf//types/known/anypb",
