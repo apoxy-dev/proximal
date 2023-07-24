@@ -73,7 +73,7 @@ Bound ports:
 
 Demo:
 
-![proximal-demo](https://github.com/apoxy-dev/proximal/assets/767232/433307a6-65a9-4c7c-9306-161753a2d8a4)
+https://github.com/apoxy-dev/proximal/assets/767232/97cea009-7f6c-47f9-b2d6-70146ef7ff3a
 
 ## Architecture
 
