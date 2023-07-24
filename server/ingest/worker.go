@@ -338,9 +338,11 @@ func (w *IngestWorker) PrepareGithubBuildActivity(
 			return nil, fmt.Errorf("failed to list remote: %w", err)
 		}
 		for _, r := range ref {
-			if (r.Name().IsBranch() || r.Name().IsTag()) && r.Name().Short() == in.Params.Branch {
-				commit = r.Hash().String()
-				break
+			if r.Name().IsBranch() || r.Name().IsTag() {
+				if r.Name().Short() == in.Params.Branch {
+					commit = r.Hash().String()
+					break
+				}
 			}
 		}
 		if commit == "" {
@@ -532,7 +534,12 @@ func (w *IngestWorker) BuildActivity(ctx context.Context, sha string, in *Middle
 	logger.Info("Running builder", "Builder", builder, "SrcDir", srcDir)
 
 	runWasmOut := filepath.Join(w.runDir(ctx, in.Slug, sha), "wasm.out")
-	stdout, stderr, err := builder.Run(ctx, srcDir, runWasmOut, in.Params.BuildArgs...)
+	stdout, stderr, err := builder.Run(
+		ctx,
+		filepath.Join(srcDir, in.Params.RootDir),
+		runWasmOut,
+		in.Params.BuildArgs...,
+	)
 	if err != nil {
 		return fmt.Errorf("builder failed: %w", err)
 	}

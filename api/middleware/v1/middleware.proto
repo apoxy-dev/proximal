@@ -19,25 +19,31 @@ message MiddlewareIngestParams {
   // GitHub owner/repo for the GitHub source. Ignored for other types.
   string github_repo = 2;
 
+  // Root directory for the build. If empty, defaults to repo root or watch_dir
+  // for direct sources. This is useful for monorepos. For example, if the
+  // go.mod file is in the "middleware/go" directory, set this to
+  // "middleware/go".
+  string root_dir = 3;
+
   // Branch name for the GitHub source. Ignored for other types. Only one of commit or branch
   // can be set.
-  string branch = 3;
+  string branch = 4;
 
   // Commit for the GitHub source. Ignored for other types. Only one of commit or branch
   // can be set.
-  string commit = 4;
+  string commit = 5;
 
   // Directory to ingest from the direct source. Ignored for other types.
-  string watch_dir = 5;
+  string watch_dir = 6;
 
   enum MiddlewareLanguage {
     UNKNOWN_LANGUAGE = 0;
     GO = 1;
     RUST = 2;
   }
-  MiddlewareLanguage language = 6;
+  MiddlewareLanguage language = 7;
 
-  repeated string build_args = 7;
+  repeated string build_args = 8;
 }
 
 message MiddlewareRuntimeParams {

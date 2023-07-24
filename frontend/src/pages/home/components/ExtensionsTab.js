@@ -229,6 +229,7 @@ const FromGitHub = (props) => {
       ingest_params: {
         type: 'GITHUB',
         github_repo: request['repo'],
+        root_dir: request['root_dir'],
         branch: request['branch'],
         commit: request['commit'],
         language: language,
@@ -268,6 +269,8 @@ const FromGitHub = (props) => {
             <InputExample>eg. <strong>https://github.com/proxy-wasm/proxy-wasm-rust-sdk.git</strong></InputExample>
             <TextInput placeholder="Branch / Commit" sx={{ width: '100%' }} onChange={onChange('ref')} />
             <InputExample>eg. <strong>main</strong> or <strong>&lt;commit sha&gt;</strong></InputExample>
+            <TextInput placeholder="Root Dir (optional)" sx={{ width: '100%' }} onChange={onChange('root_dir')} />
+            <InputExample>repo subdir to run commands in, eg. <strong>./examples/http_headers/</strong></InputExample>
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Language</InputLabel>
               <Select
@@ -282,7 +285,7 @@ const FromGitHub = (props) => {
               </Select>
             </FormControl>
             <TextInput placeholder="Build Args (optional)" sx={{ width: '100%' }} onChange={onChange('args')} />
-            <InputExample>flags to pass to the compiler eg. <strong>--manifest-path ./subdir/Cargo.toml</strong></InputExample>
+            <InputExample>flags to pass to the compiler eg. <strong>-scheduler=none</strong></InputExample>
           </Grid>
           <Grid item xs={12} container>
             <Button variant="contained" endIcon={<ArrowRight />} sx={{ margin: '0 auto' }} onClick={create} disabled={!valid()}>
