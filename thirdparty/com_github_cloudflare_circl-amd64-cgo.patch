@@ -1,0 +1,88 @@
+diff --git a/dh/x25519/BUILD.bazel b/dh/x25519/BUILD.bazel
+index d569bc1..76c14cd 100644
+--- a/dh/x25519/BUILD.bazel
++++ b/dh/x25519/BUILD.bazel
+@@ -12,7 +12,9 @@ go_library(
+         "doc.go",
+         "key.go",
+         "table.go",
++	"//math/fp25519:fp_amd64.h",
+     ],
++    cgo = True,
+     importpath = "github.com/cloudflare/circl/dh/x25519",
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -25,6 +27,8 @@ go_library(
+     }),
+ )
+ 
++exports_files(["curve_amd64.h"], ["//visibility:public"])
++
+ alias(
+     name = "go_default_library",
+     actual = ":x25519",
+diff --git a/dh/x448/BUILD.bazel b/dh/x448/BUILD.bazel
+index ed287c6..ec9ef98 100644
+--- a/dh/x448/BUILD.bazel
++++ b/dh/x448/BUILD.bazel
+@@ -12,7 +12,9 @@ go_library(
+         "doc.go",
+         "key.go",
+         "table.go",
++	"//math/fp448:fp_amd64.h",
+     ],
++    cgo = True,
+     importpath = "github.com/cloudflare/circl/dh/x448",
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -25,6 +27,8 @@ go_library(
+     }),
+ )
+ 
++exports_files(["curve_amd64.h"], ["//visibility:public"])
++
+ alias(
+     name = "go_default_library",
+     actual = ":x448",
+diff --git a/math/fp25519/BUILD.bazel b/math/fp25519/BUILD.bazel
+index c9973ac..4573937 100644
+--- a/math/fp25519/BUILD.bazel
++++ b/math/fp25519/BUILD.bazel
+@@ -10,6 +10,7 @@ go_library(
+         "fp_generic.go",
+         "fp_noasm.go",
+     ],
++    cgo = True,
+     importpath = "github.com/cloudflare/circl/math/fp25519",
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -22,6 +23,8 @@ go_library(
+     }),
+ )
+ 
++exports_files(["fp_amd64.h"], ["//visibility:public"])
++
+ alias(
+     name = "go_default_library",
+     actual = ":fp25519",
+diff --git a/math/fp448/BUILD.bazel b/math/fp448/BUILD.bazel
+index c371ca5..0f5f43d 100644
+--- a/math/fp448/BUILD.bazel
++++ b/math/fp448/BUILD.bazel
+@@ -10,6 +10,7 @@ go_library(
+         "fp_generic.go",
+         "fp_noasm.go",
+     ],
++    cgo = True,
+     importpath = "github.com/cloudflare/circl/math/fp448",
+     visibility = ["//visibility:public"],
+     deps = [
+@@ -22,6 +23,8 @@ go_library(
+     }),
+ )
+ 
++exports_files(["fp_amd64.h"], ["//visibility:public"])
++
+ alias(
+     name = "go_default_library",
+     actual = ":fp448",

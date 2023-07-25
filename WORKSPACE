@@ -72,6 +72,11 @@ go_repository(
     name = "com_github_cloudflare_circl",
     importpath = "github.com/cloudflare/circl",
     sum = "h1:fE/Qz0QdIGqeWfnwq0RE0R7MI51s0M2E4Ga9kq5AEMs=",
+    patch_args = ["-p1"],
+    patches = [
+        # CGo headers need to be properly referenced for amd64 paltform.
+        "//thirdparty:com_github_cloudflare_circl-amd64-cgo.patch",
+    ],
     version = "v1.3.3",
 )
 
