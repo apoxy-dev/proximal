@@ -1,12 +1,17 @@
 <br /><br />
 
-<p align="center">
+<div align="center">
+
 <a href="https://apoxy.dev">
   <img src="static/github-proximal.png" alt="Proximal Logo" width="350">
 </a>
-</p>
+<br />
 <br />
 
+[![Apache 2.0 License](https://badgen.net/badge/License/Apache2.0?icon=github)](LICENSE) [![Slack Community](https://img.shields.io/badge/slack-apoxy-bde868.svg?logo=slack)](http://slack.apoxy.dev/)
+  
+</div>
+<br />
 
 Welcome to Proximal, an open-source project that empowers you to develop
 [Proxy-WASM](https://github.com/proxy-wasm/spec) modules for [Envoy](https://www.envoyproxy.io)
