@@ -71,10 +71,10 @@ The above command mounts your home directory at `/mnt` inside the container so y
 Proxy-WASM code (e.g. `/mnt/myprojects/myawesome-proxy-wasm-go/`). Adjust as needed.
 
 Bound ports:
-* `8080` - Web UI (see below) and REST API at `:8080/v1/` (see definitions under `//api` folder).
-* `9901` - Envoy admin endpoint/UI.
-* `9088` - Temporal UI (for easier build workflow debugging).
-* `18000` - Port of the Envoy listener - you can test your proxy configurations using `localhost:18000`.
+* `8080` - Web UI (see below) and REST API at `:8080/v1/` (see definitions in the [`//api`](https://github.com/apoxy-dev/proximal/tree/main/api) folder).
+* `18000` - Envoy listener - test your proxy configurations by sending requests to `localhost:18000`.
+* `9901` - Envoy admin UI.
+* `9088` - Temporal UI (for build workflow debugging).
 
 Demo:
 
@@ -83,25 +83,25 @@ https://github.com/apoxy-dev/proximal/assets/767232/97cea009-7f6c-47f9-b2d6-7014
 ## Architecture
 
 We rely on Envoy as the main [data plane](https://en.wikipedia.org/wiki/Forwarding_plane) processing
-engine for request routing and its WebAssembly (WASI) extension engine which uses Proxy-WASM ABI for
-interop between Envoy and WASM runtime. The default runtime is [Chromium V8](https://v8.dev) but
-other runtimes such as [Wasmtime](https://wasmtime.dev),
-[Wamr](https://github.com/bytecodealliance/wasm-micro-runtime), and [WAVM](https://wavm.github.io/)
-can be swapped in.
+engine for request routing and its WebAssembly (WASI) extension engine that implements the Proxy-WASM
+ABI. The default runtime is [Chromium V8](https://v8.dev) but other runtimes such as
+[Wasmtime](https://wasmtime.dev),
+[Wamr](https://github.com/bytecodealliance/wasm-micro-runtime), and
+[WAVM](https://wavm.github.io/)
+can be configured.
 
 The control plane server is a single Go binary that combines an Envoy control plane (using xDS
-protocol), a REST API server and associated CRUD logic, a React SPA served from Go, and a
-[Temporal](https://temporal.io) server (which is linked directly via awesome
-[temporalite](https://github.com/temporalio/temporalite) library) for managing build workflows. The
-same binary also acts as Temporal worker and manages Envoy process.
+protocol), a REST API server, a React app, and a [Temporal](https://temporal.io) server
+(which is linked directly via the awesome [temporalite](https://github.com/temporalio/temporalite) library)
+for managing build workflows. The same binary also acts as a Temporal worker and manages the Envoy process.
 
-Internal state is supported by an embedded SQLite instance which produces `sqlite3.db` file on local
-disk. Temporal server has its own SQLite db file `temporalite.db`. Both of these need to be exported
+Internal state is supported by an embedded SQLite instance which produces an `sqlite3.db` file on local
+disk. The Temporal server has its own SQLite db file - `temporalite.db`. Both of these need to be exported
 via Docker volume mount if you want state persisted across Docker runs.
 
-Compiled `.wasm` binaries are stored on local disk.
+Compiled `.wasm` binaries are stored on local disk in the `/tmp/proximal/` directory.
 
-HTML/CSS/Javascript assets currently live on local filesystem but will be embedded in the binary
+HTML/CSS/JavaScript assets currently live on local filesystem but will be embedded in the binary
 itself in the future.
 
 High-level Design:
@@ -116,28 +116,30 @@ Known Limitations:
   While it's possible to run it on remote host since it's packaged in Docker, replication features
   are rather lacking.
 * TCP filters aren't yet supported.
-* Currently Proximal supports re-triggering builds from git source manually. Automatic build
+* Currently Proximal supports re-triggering builds from a git source manually. Automatic build
   triggers from GitHub commit webhooks or the like aren't suppported since they would require a
   hosted solution with a stable webhook endpoint.
 
-TBDs:
+Roadmap:
 
-* More supported SDKs: AssemblyScript, C++, Javascript, and Python.
-* Istio integration - make this thing work with an existing Istio-enabled cluster.
-* K/V store integration a la Cloudflare Workers KV.
-* More capabable logging / tracing / accounting.
-* TCP and possibly UDP filters.
+* More SDKs + Examples - [AssemblyScript](https://github.com/apoxy-dev/proximal/issues/1),
+  [C++](https://github.com/apoxy-dev/proximal/issues/2),
+  [JavaScript](https://github.com/apoxy-dev/proximal/issues/3), and
+  [Python](https://github.com/apoxy-dev/proximal/issues/4).
+* Istio examples - show how you take these modules into an existing Istio-enabled cluster.
+* K/V store integration.
+* Improved logging / tracing / accounting.
+* TCP and UDP filters.
 
-If you're interested in any of above features (or maybe something else), feel free to drop a note to
-[Apoxy Team](mailto:hello@apoxy.dev).
+If you're interested in any of above features (or maybe something else), feel free to drop a note to the
+[Apoxy Team](mailto:hello@apoxy.dev) or open an issue on this repo!
 
 ## Contributing
 
 Patches Welcome! (no, really)
 
-Proximal is an open-source project, and we welcome contributions from the community. If you find
-bugs, or wish to contribute code, please check out our [contribution guidelines](DEVELOPING.md) for
-detailed instructions.
+Proximal welcomes contributions from the community. If you find bugs, or wish to contribute code, please
+check out our [contribution guidelines](DEVELOPING.md) for detailed instructions.
 
 ### Support and Feedback
 
