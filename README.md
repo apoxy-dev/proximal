@@ -13,51 +13,51 @@
 </div>
 <br />
 
-Welcome to Proximal, an open-source project that empowers you to develop
+Proximal makes it easy to develop
 [Proxy-WASM](https://github.com/proxy-wasm/spec) modules for [Envoy](https://www.envoyproxy.io)
-right on your local machine (or really anywhere since it's all in a [Docker
+right on your local machine (or anywhere you can run our [Docker
 image](https://hub.docker.com/r/apoxy/proximal)).
-
-Proximal provides an intuitive and efficient environment to create, test, and iterate on your Envoy
-Proxy extensions with ease.
 
 ### What is Proxy-WASM?
 
 [Proxy-WASM](https://github.com/proxy-wasm/spec) (WebAssembly) is a powerful technology that enables
-you to extend the functionality of modern proxies like [Envoy](https://www.envoyproxy.io). using
-WebAssembly (WASI) modules. By writing Proxy-WASM modules, you can tell your L4/L7 proxy to inspect,
-mutate, and route requests as they are passing through, all in a language-independent, sandboxed
-environment. It works with both HTTP and TCP-based connection and SDKs are available for Rust, Go,
-C++, and AssemblyScript (We're working on Javascript and Python).
+you to extend the functionality of modern proxies like [Envoy](https://www.envoyproxy.io) with
+WebAssembly modules. By writing Proxy-WASM modules, you can write code in your L4/L7 proxy that inspects,
+mutates, and routes requests as they are passing through, all in a language-independent and sandboxed
+environment. It works with both HTTP and TCP-based connection and SDKs are available for
+[Rust](https://github.com/proxy-wasm/proxy-wasm-rust-sdk),
+[Go](https://github.com/tetratelabs/proxy-wasm-go-sdk),
+[C++](https://github.com/proxy-wasm/proxy-wasm-cpp-sdk), and
+[AssemblyScript](https://github.com/solo-io/proxy-runtime) (we're working on JavaScript and Python).
 
-It is used by popular projects such as Envoy, [Istio](https://istio.io/latest/docs/concepts/wasm/),
-and
-[APSIX](https://apisix.apache.org/blog/2021/11/19/apisix-supports-wasm/#how-to-use-wasm-in-apache-apisix)
+These standards based WebAssembly modules can be used with [Istio](https://istio.io/latest/docs/concepts/wasm/),
+[MOSN](https://github.com/mosn/mosn) and
+[APSIX](https://apisix.apache.org/blog/2021/11/19/apisix-supports-wasm/#how-to-use-wasm-in-apache-apisix) as well.
 
 ## Why Proximal?
 
 Developing Proxy-WASM modules for Envoy traditionally involves cumbersome setups, complex
-toolchains, and time-consuming testing iterations on a remote environment. Proximal changes the game
-by bringing the entire development process to a local machine all wrapped up into a single process
-environment which comes with UI and REST API.
+toolchains, and time-consuming testing iterations, frequently on a remote environment.
+Proximal simplifies the development process and brings it to you local machine in a single process
+environment with a friendly UI and basic REST API.
+
+We believe that developers have been held back from adopting this incredibly powerful technology because
+the developer experience for WASM and Proxy-WASM has been a little rough around the edges. Proximial is here to help.
 
 ### Key Features:
 
-* *Local Development*: Forget about deploying to remote environments for every code change. Proximal
+* **Local Development**: Forget about deploying to remote environments for every code change. Proximal
   allows you to develop and test your Proxy-WASM modules locally, saving you valuable time and
-  effort. It features a full-blown workflow engine to compile Proxy-WASM modules from sources into
-  WebAssembly WASI binary representation (.wasm) and load them into Envoy automatically. Git and
-  local filesystem sources are supported.
+  effort. It features a workflow engine that compiles source code into
+  WebAssembly binary (.wasm) and loads them into Envoy automatically.
 
-* *Simplified Setup*: Setting up a development environment for Proxy-WASM can be daunting. Proximal
-  streamlines the process, ensuring you get started quickly with minimal configuration.
+* **Rapid Iterations**: Change your code and see the results almost instantaneously. Proximal continuously
+  watches a working directory (even Docker mounted volumes) and triggers a rebuild/reload of your module in Envoy automatically.
 
-* *Rapid Iterations*: With Proximal, you can rapidly iterate on your code, making changes and seeing
-  the results almost instantaneously. Proximal will continuously watch working directory (even
-  through mounted volume when in Docker) and trigger a rebuild/reload automatically.
+* **Simplified Setup + Examples**: Setting up a development environment for Proxy-WASM can be daunting. Proximal
+  streamlines the process and provides a few examples you can use to get started with minimal configuration.
 
-* *Observability*: Debugging Proxy-WASM modules is made easy with Proximal's logs capture support -
-  you can see how requests and responses are passing through in real-time.
+* **Observability**: Debugging is easier with integrated logs capture. See requests and responses in real-time.
 
 ## Getting Started
 
