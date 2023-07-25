@@ -101,7 +101,7 @@ itself in the future.
 
 High-level Design:
 
-![Proximal (design)](https://github.com/apoxy-dev/proximal/assets/767232/b899d6c4-f133-46fa-8b2f-6872c0ae43e4)
+![Proximal (design)](https://github.com/apoxy-dev/proximal/assets/767232/c720a290-3873-428f-b927-525cc31681fc)
 
 ## Known Limitations / Future Improvements
 
