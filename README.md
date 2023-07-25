@@ -64,10 +64,10 @@ the developer experience for WASM and Proxy-WASM has been a little rough around 
 Run via Docker container:
 
 ```shell
-docker run -p 8080:8080 -p 9901:9901 -p 9088:9088 -p 18000:18000 -v $HOME:/mnt docker.io/apoxy/proximal:latest
+docker run -p 8080:8080 -p 9901:9901 -p 9088:9088 -p 18000:18000 -v `pwd`:/mnt docker.io/apoxy/proximal:latest
 ```
 
-The above command mounts your home directory at `/mnt` inside the container so you can ingest local
+The above command mounts your current working directory at `/mnt` inside the container so you can ingest local
 Proxy-WASM code (e.g. `/mnt/myprojects/myawesome-proxy-wasm-go/`). Adjust as needed.
 
 Bound ports:
