@@ -1,5 +1,20 @@
 # Developer Documentation
 
+## Building Proximal
+
+Since we rely on considerable amount of codegen (Protobufs, gRPC, gRPC-GW, sqlc) this project is
+using [Bazel](https://bazel.build) for its build automation. Bazel version is pinned using
+`.bazeliskrc` in the root so we recommend using [Bazelisk](https://github.com/bazelbuild/bazelisk)
+for the least amount of surprise.
+
+To build the Proximal server process:
+```shell
+bazel build --config=`arch` //cmd/server
+```
+
+This above command will use [zig cc toolchain](https://sr.ht/~motiejus/bazel-zig-cc/) to compile and
+link Linux binary for amd64/aarch64 archs. That means cross-compilation when running from Mac hosts.
+
 ## Create New Release
 
 1. Build images for `linux/arm64` and `linux/amd64` architectures stamped with
@@ -59,4 +74,4 @@ docker buildx imagetools create -t docker.io/apoxy/proximal:$TAG \
 docker buildx imagetools create -t docker.io/apoxy/proximal:latest docker.io/apoxy/proximal:$TAG
 ```
 
-:tada:
+:tada:!
