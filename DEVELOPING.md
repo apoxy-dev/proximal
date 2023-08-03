@@ -15,6 +15,18 @@ bazel build --config=`arch` //cmd/server
 This above command will use [zig cc toolchain](https://sr.ht/~motiejus/bazel-zig-cc/) to compile and
 link Linux binary for amd64/aarch64 archs. That means cross-compilation when running from Mac hosts.
 
+Not to run a locally-built image:
+```shell
+bazel run --config=`arch` --stamp //cmd/server:go.image -- --norun && \
+    docker run -p 8080:8080 -p 9901:9901 -p 9088:9088 -p 18000:18000 -v $HOME:/mnt bazel/cmd/server:go.image
+```
+
+### Building Frontend
+
+Run `npm run build` from the `//frontend` directory. Then make sure to `git add` the
+`//frontend/build` directory to vendor all generated assets. Just re-run `bazel run` command above
+to re-launch with updated frontend code.
+
 ## Create New Release
 
 1. Build images for `linux/arm64` and `linux/amd64` architectures stamped with
