@@ -18,6 +18,11 @@ Proximal makes it easy to develop
 right on your local machine (or anywhere you can run our [Docker
 image](https://hub.docker.com/r/apoxy/proximal)).
 
+### TL;DR
+
+Try running `docker run -p 8080:8080 -p 18000:18000 docker.io/apoxy/proximal:latest`
+then visit http://localhost:8080
+
 ### What is Proxy-WASM?
 
 [Proxy-WASM](https://github.com/proxy-wasm/spec) (WebAssembly) is a powerful technology that enables
@@ -38,7 +43,7 @@ These standards based WebAssembly modules can be used with [Istio](https://istio
 
 Developing Proxy-WASM modules for Envoy traditionally involves cumbersome setups, complex
 toolchains, and time-consuming testing iterations, frequently on a remote environment.
-Proximal simplifies the development process and brings it to you local machine in a single process
+Proximal simplifies the development process and brings it to your local machine in a single process
 environment with a friendly UI and basic REST API.
 
 We believe that developers have been held back from adopting this incredibly powerful technology because
