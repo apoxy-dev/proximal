@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
+import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
 import MenuList from '@mui/material/MenuList';
@@ -141,7 +142,7 @@ const AddExtensions = (props) => (
     </Grid>
 
     <Grid item xs={4} align="right">
-      <Button variant="contained" onClick={props.openPopup('github')}>
+      <Button variant="contained" onClick={props.showInput('github')}>
         From GitHub
       </Button>
     </Grid>
@@ -152,7 +153,7 @@ const AddExtensions = (props) => (
     </Grid>
 
     <Grid item xs={4} align="right">
-      <Button variant="contained" onClick={props.openPopup('local')}>
+      <Button variant="contained" onClick={props.showInput('local')}>
         Local Repo
       </Button>
     </Grid>
@@ -174,7 +175,7 @@ const GettingStarted = (props) => {
           functionality of your application.
         </Typography>
       </Container>
-      <AddExtensions openPopup={props.openPopup} />
+      <AddExtensions openPopup={props.openPopup} showInput={props.showInput} />
     </>
   );
 };
@@ -215,8 +216,7 @@ const FromGitHub = (props) => {
         } else {
           key = 'branch';
         }
-      }
-      if (key === 'args') {
+      } else if (key === 'args') {
         value = value === '' ? [] : value.split(' ');
       }
       setRequest({ ...request, [key]: value });
@@ -233,12 +233,15 @@ const FromGitHub = (props) => {
         branch: request['branch'],
         commit: request['commit'],
         language: language,
+      },
+      runtime_params: {
+        config_string: request['config'],
       }
     };
     if (request['args']) {
       middleware.ingest_params['build_args'] = request['args'];
     }
-    props.onClose();
+    props.onCreate();
     props.onEndpoints(await Middleware.Create(middleware), []);
   };
 
@@ -258,19 +261,39 @@ const FromGitHub = (props) => {
     return true;
   };
   return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <SimpleModal>
-        <Typography variant="h4" align="center">GitHub Extension</Typography>
-        <Grid container spacing={4} marginTop={1}>
-          <Grid item xs={12} container alignItems="center">
+    <Fragment>
+      <Typography variant="h5" align="left" marginTop={2}>Set Up GitHub Extension</Typography>
+      <Grid container spacing={4} marginTop={1}>
+        <Grid item xs={12} container alignItems="center">
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Slug" sx={{ width: '100%' }} onChange={onChange('slug')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Slugs are used to identify your extension in the UI and API
             <InputExample>eg. <strong>my_extension</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Git Repo" sx={{ width: '100%' }} onChange={onChange('repo')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Git repo containing your extension code
             <InputExample>eg. <strong>https://github.com/proxy-wasm/proxy-wasm-rust-sdk.git</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Branch / Commit" sx={{ width: '100%' }} onChange={onChange('ref')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Branch of commit to checkout from
             <InputExample>eg. <strong>main</strong> or <strong>&lt;commit sha&gt;</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Root Dir (optional)" sx={{ width: '100%' }} onChange={onChange('root_dir')} />
-            <InputExample>repo subdir to run commands in, eg. <strong>./examples/http_headers/</strong></InputExample>
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Optional repository subdirectory to run build commands from
+            <InputExample>eg. <strong>./examples/http_headers/</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Language</InputLabel>
               <Select
@@ -284,21 +307,35 @@ const FromGitHub = (props) => {
                 <MenuItem value="RUST">Rust</MenuItem>
               </Select>
             </FormControl>
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4}>
+            Language source
+          </Grid>
+          <Grid item xs={4} container alignItems="left">
             <TextInput placeholder="Build Args (optional)" sx={{ width: '100%' }} onChange={onChange('args')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" direction="column" paddingLeft={4}>
+            Optional build arguments to pass to the compiler
             <InputExample>flags to pass to the compiler eg. <strong>-scheduler=none</strong></InputExample>
           </Grid>
-          <Grid item xs={12} container>
-            <Button variant="contained" endIcon={<ArrowRight />} sx={{ margin: '0 auto' }} onClick={create} disabled={!valid()}>
-              Let's Go
-            </Button>
+          <Grid item xs={4} container alignItems="left">
+            <TextInput placeholder="Config (optional)" sx={{ width: '100%' }} onChange={onChange('config')} multiline rows={8} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" direction="column" paddingLeft={4}>
+            Optional runtime configuration to pass to the extension
           </Grid>
         </Grid>
-        <Typography variant="body1" align="center" marginTop={4}>
-          Think we should add this to our examples?<br/>
-          Let us know by emailing <Link href="mailto:hello@apoxy.dev">hello@apoxy.dev</Link>.
-        </Typography>
-      </SimpleModal>
-    </Modal>
+        <Grid item xs={12} marginTop={2} marginLeft={2}>
+          <Button variant="contained" endIcon={<ArrowRight />} sx={{ margin: '0 auto' }} onClick={create} disabled={!valid()}>
+            Let's Go
+          </Button>
+        </Grid>
+      </Grid>
+      <Typography variant="body1" align="center" marginTop={4} marginBottom={8}>
+        Think we should add this to our examples?<br/>
+        Let us know by emailing <Link href="mailto:hello@apoxy.dev">hello@apoxy.dev</Link>.
+      </Typography>
+    </Fragment>
   );
 };
 
@@ -323,12 +360,15 @@ const FromLocalRepo = (props) => {
         type: 'DIRECT',
         language: language,
         watch_dir: request['watch_dir'],
+      },
+      runtime_params: {
+        config_string: request['config'],
       }
     };
     if (request['args']) {
       middleware.ingest_params['build_args'] = request['args'];
     }
-    props.onClose();
+    props.onCreate();
     props.onEndpoints(await Middleware.Create(middleware), []);
   };
 
@@ -346,18 +386,27 @@ const FromLocalRepo = (props) => {
   };
 
   return (
-    <Modal open={props.open} onClose={props.onClose}>
-      <SimpleModal>
-        <Typography variant="h4" align="center">Local Development</Typography>
-        <Grid container spacing={4} marginTop={1}>
-          <Grid item xs={12} container alignItems="center">
+    <Fragment>
+      <Typography variant="h5" align="left" marginTop={2}>Set Up Local Extension</Typography>
+      <Grid container spacing={4} marginTop={1}>
+        <Grid item xs={12} container alignItems="center">
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Slug" sx={{ width: '100%' }} onChange={onChange('slug')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Unique identifier for your extension
             <InputExample>eg. <strong>my_extension</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <TextInput placeholder="Host Path" sx={{ width: '100%' }} onChange={onChange('watch_dir')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4} direction="column">
+            Absolute path on the server's host
             <InputExample>
-              <strong>Absolute path</strong> on the server's host<br/>
               eg. <strong>/home/bobross/go/src/github.com/happy-accidents/proxy-art</strong>
             </InputExample>
+          </Grid>
+          <Grid item xs={4} align="left">
             <FormControl fullWidth>
               <InputLabel id="demo-simple-select-label">Language</InputLabel>
               <Select
@@ -371,17 +420,31 @@ const FromLocalRepo = (props) => {
                 <MenuItem value="RUST">Rust</MenuItem>
               </Select>
             </FormControl>
-            <TextInput placeholder="Build Args (optional)" sx={{ width: '100%' }} onChange={onChange('args')} />
-            <InputExample>flags to pass to the compiler eg. <strong>--manifest-path ./subdir/Cargo.toml</strong></InputExample>
           </Grid>
-          <Grid item xs={12} container>
-            <Button variant="contained" endIcon={<ArrowRight />} sx={{ margin: '0 auto' }} onClick={create} disabled={!valid()}>
-              Let's Go
-            </Button>
+          <Grid item xs={8} container alignItems="left" paddingLeft={4}>
+            Language source
+          </Grid>
+          <Grid item xs={4} container alignItems="left">
+            <TextInput placeholder="Build Args (optional)" sx={{ width: '100%' }} onChange={onChange('args')} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" direction="column" paddingLeft={4}>
+            Optional build arguments to pass to the compiler
+            <InputExample>eg. <strong>--manifest-path ./subdir/Cargo.toml</strong></InputExample>
+          </Grid>
+          <Grid item xs={4} container alignItems="left">
+            <TextInput placeholder="Config (optional)" sx={{ width: '100%' }} onChange={onChange('config')} multiline rows={8} />
+          </Grid>
+          <Grid item xs={8} container alignItems="left" direction="column" paddingLeft={4}>
+            Optional runtime configuration to pass to the extension
           </Grid>
         </Grid>
-      </SimpleModal>
-    </Modal>
+        <Grid item xs={12} marginTop={2} marginLeft={2}>
+          <Button variant="contained" endIcon={<ArrowRight />} sx={{ margin: '0 auto' }} onClick={create} disabled={!valid()}>
+            Let's Go
+          </Button>
+        </Grid>
+      </Grid>
+    </Fragment>
   );
 };
 
@@ -390,7 +453,7 @@ const AddModal = (props) => {
     <Modal open={props.open} onClose={props.onClose}>
       <SimpleModal>
         <Typography variant="h4" align="center">Add an Extension</Typography>
-        <AddExtensions openPopup={props.openPopup} />
+        <AddExtensions openPopup={props.openPopup} showInput={props.showInput} />
       </SimpleModal>
     </Modal>
   );
@@ -588,6 +651,7 @@ const ExtensionsTab = () => {
   let [ popup, setPopup ] = useState('');
   let [ active, setActive ] = useState('');
   let [ endpoints, setEndpoints ] = useState([]);
+  let [ input, setInput ] = useState('');
 
   const closePopup = () => {
     setPopup('');
@@ -596,6 +660,17 @@ const ExtensionsTab = () => {
   const openPopup = (type) => {
     return () => {
       setPopup(type);
+    };
+  };
+
+  const hideInput = () => {
+    setInput('');
+    setPopup('');
+  };
+
+  const showInput = (type) => {
+    return () => {
+      setInput(type);
     };
   };
 
@@ -666,24 +741,13 @@ const ExtensionsTab = () => {
       </>);
   }
 
-  return (
-    <>
-      <FromExample open={popup === 'example'} onClose={closePopup} onEndpoints={onEndpoints} />
-      <FromGitHub open={popup === 'github'} onClose={closePopup} onEndpoints={onEndpoints} />
-      <FromLocalRepo open={popup === 'local'} onClose={closePopup} onEndpoints={onEndpoints} />
-      <AddEndpoints open={popup === 'endpoints'} onClose={closePopup} endpoints={endpoints} />
-      <AddModal open={popup === 'add'} onClose={closePopup} openPopup={openPopup} />
-
-      <Grid container sx={{ paddingBottom: 2, borderBottom: 1, borderColor: 'divider' }}>
-        <Grid item container xs={6} alignItems="center">
-          <ExtensionsStatus status={'ready'} />
-        </Grid>
-        <Grid item xs={6} alignItems="right" align="right">
-          <Button color="secondary" variant="contained" onClick={openPopup('add')}>
-            Add an Extension
-          </Button>
-        </Grid>
-      </Grid>
+  let body;
+  if (input === 'github') {
+    body = <FromGitHub onCreate={hideInput} onEndpoints={onEndpoints} />;
+  } else if (input === 'local') {
+    body = <FromLocalRepo onCreate={hideInput} onEndpoints={onEndpoints} />;
+  } else {
+    body = (
       <Grid container spacing={2}>
         <Grid item xs={3} marginTop={1}>
           <MenuList sx={{ width: '100%' }}>
@@ -693,6 +757,7 @@ const ExtensionsTab = () => {
                 selected={m.slug === active}
                 onClick={() => setActive(m.slug)}
               >
+                {m.slug === active && <Box sx={{ height: '100%', width: '2px', backgroundColor: 'secondary.main', position: 'absolute', left: 0 }} />}
                 <ExtensionStatus status={m.status} />
                 {m.slug}
               </MenuItem>
@@ -702,7 +767,28 @@ const ExtensionsTab = () => {
         <Grid item xs={9}>
           <ExtensionSettings extension={middlewareBySlug(active)} reload={reload} />
         </Grid>
-      </Grid>
+      </Grid>);
+  }
+
+  return (
+    <>
+      <FromExample open={popup === 'example'} onClose={closePopup} onEndpoints={onEndpoints} />
+      <AddEndpoints open={popup === 'endpoints'} onClose={closePopup} endpoints={endpoints} />
+      <AddModal open={popup === 'add'} onClose={closePopup} openPopup={openPopup} showInput={showInput} />
+
+      {input === '' &&
+        <Grid container sx={{ paddingBottom: 2, borderBottom: 1, borderColor: 'divider' }}>
+          <Grid item container xs={6} alignItems="center">
+            <ExtensionsStatus status={'ready'} />
+          </Grid>
+          <Grid item xs={6} alignItems="right" align="right">
+            <Button color="secondary" variant="contained" onClick={openPopup('add')}>
+              Add an Extension
+            </Button>
+          </Grid>
+        </Grid>
+      }
+      {body}
     </>
   );
 };
