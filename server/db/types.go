@@ -10,8 +10,9 @@ var (
 )
 
 var (
-	MiddlewareStatusUnknown = middlewarev1.Middleware_UNKNOWN.String()
-	MiddlewareStatusPending = middlewarev1.Middleware_PENDING.String()
-	MiddlewareStatusReady   = middlewarev1.Middleware_READY.String()
-	MiddlewareStatusErrored = middlewarev1.Middleware_ERRORED.String()
+	MiddlewareStatusUnknown      = middlewarev1.Middleware_UNKNOWN.String()
+	MiddlewareStatusPending      = middlewarev1.Middleware_PENDING.String()
+	MiddlewareStatusPendingReady = middlewarev1.Middleware_PENDING_READY.String()
+	MiddlewareStatusReady        = middlewarev1.Middleware_READY.String()
+	MiddlewareStatusErrored      = middlewarev1.Middleware_ERRORED.String()
 )

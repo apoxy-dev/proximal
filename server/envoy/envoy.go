@@ -221,6 +221,13 @@ func (s *SnapshotManager) httpConnectionManager(ctx context.Context, mds []*midd
 	for _, middleware := range mds {
 		log.Debugf("adding middleware %s", middleware.Slug)
 
+		switch middleware.Status {
+		case middlewarev1.Middleware_READY, middlewarev1.Middleware_PENDING_READY:
+		default:
+			log.Infof("%s is not ready", middleware.Slug)
+			continue
+		}
+
 		if middleware.LiveBuildSha == "" {
 			log.Warnf("%s has no live build", middleware.Slug)
 			continue

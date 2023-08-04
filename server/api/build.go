@@ -19,6 +19,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/apoxy-dev/proximal/core/log"
+	serverdb "github.com/apoxy-dev/proximal/server/db"
 	sqlc "github.com/apoxy-dev/proximal/server/db/sql"
 	"github.com/apoxy-dev/proximal/server/ingest"
 
@@ -129,7 +130,15 @@ func (s *MiddlewareService) startBuildWorkflow(ctx context.Context, slug string,
 func (s *MiddlewareService) TriggerBuild(ctx context.Context, req *middlewarev1.TriggerBuildRequest) (*emptypb.Empty, error) {
 	log.Infof("TriggerBuild: %v", req)
 
-	m, err := s.db.Queries().GetMiddlewareBySlug(ctx, req.Slug)
+	tx, err := s.db.Begin()
+	if err != nil {
+		log.Errorf("failed to begin transaction: %v", err)
+		return nil, status.Error(codes.Internal, "failed to trigger build")
+	}
+	defer tx.Rollback()
+	qtx := s.db.Queries().WithTx(tx)
+
+	m, err := qtx.GetMiddlewareBySlug(ctx, req.Slug)
 	if err != nil {
 		if err == sql.ErrNoRows {
 			return nil, status.Errorf(codes.NotFound, "middleware %q not found", req.Slug)
@@ -147,6 +156,25 @@ func (s *MiddlewareService) TriggerBuild(ctx context.Context, req *middlewarev1.
 	if err := s.startBuildWorkflow(ctx, req.Slug, &ingestParams); err != nil {
 		log.Errorf("unable to start build workflow: %v", err)
 		return nil, status.Errorf(codes.Internal, "unable to start build workflow: %v", err)
+	}
+
+	_, err = qtx.UpdateMiddlewareStatus(ctx, sqlc.UpdateMiddlewareStatusParams{
+		Slug:   req.Slug,
+		Status: serverdb.MiddlewareStatusPendingReady,
+		StatusDetail: sql.NullString{
+			String: "build triggered",
+			Valid:  true,
+		},
+		LiveBuildSha: m.LiveBuildSha,
+	})
+	if err != nil {
+		log.Errorf("failed to update middleware status: %v", err)
+		return nil, status.Error(codes.Internal, "failed to trigger build")
+	}
+
+	if err := tx.Commit(); err != nil {
+		log.Errorf("failed to commit transaction: %v", err)
+		return nil, status.Error(codes.Internal, "failed to trigger build")
 	}
 
 	return &emptypb.Empty{}, nil
