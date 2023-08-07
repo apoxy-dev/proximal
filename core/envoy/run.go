@@ -57,6 +57,7 @@ func (r *Release) DownloadBinaryFromGitHub(ctx context.Context) (io.ReadCloser, 
 type Runtime struct {
 	EnvoyPath           string
 	BootstrapConfigPath string
+	BootstrapConfigYAML string
 	Release             *Release
 
 	cmd *exec.Cmd
@@ -65,9 +66,16 @@ type Runtime struct {
 func (r *Runtime) run(ctx context.Context) error {
 	id := uuid.New().String()
 	log.Infof("running envoy withe node: { id: %s }", id)
+	configYAML := fmt.Sprintf(`node: { id: "%s", cluster: "proximal" }`, id)
+	if r.BootstrapConfigYAML != "" {
+		log.Infof("using bootstrap config:\n%s", r.BootstrapConfigYAML)
+		configYAML = r.BootstrapConfigYAML
+	}
 	args := []string{
-		"-c", r.BootstrapConfigPath,
-		"--config-yaml", fmt.Sprintf(`node: { id: "%s", cluster: "proximal" }`, id),
+		"--config-yaml", configYAML,
+	}
+	if r.BootstrapConfigPath != "" {
+		args = append(args, "-c", r.BootstrapConfigPath)
 	}
 	r.cmd = exec.CommandContext(ctx, r.envoyPath(), args...)
 	r.cmd.Stdout = os.Stdout
