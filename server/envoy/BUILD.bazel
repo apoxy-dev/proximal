@@ -2,10 +2,7 @@ load("@io_bazel_rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "envoy",
-    srcs = [
-        "envoy.go",
-        "run.go",
-    ],
+    srcs = ["envoy.go"],
     importpath = "github.com/apoxy-dev/proximal/server/envoy",
     visibility = ["//visibility:public"],
     deps = [
@@ -37,7 +34,6 @@ go_library(
         "@com_github_envoyproxy_go_control_plane//pkg/server/v3:server",
         "@com_github_envoyproxy_go_control_plane//pkg/wellknown",
         "@com_github_gogo_status//:status",
-        "@com_github_google_uuid//:uuid",
         "@org_golang_google_grpc//:go_default_library",
         "@org_golang_google_grpc//codes",
         "@org_golang_google_protobuf//types/known/anypb",

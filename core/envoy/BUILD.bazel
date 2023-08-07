@@ -1,0 +1,12 @@
+load("@io_bazel_rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "envoy",
+    srcs = ["run.go"],
+    importpath = "github.com/apoxy-dev/proximal/core/envoy",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//core/log",
+        "@com_github_google_uuid//:uuid",
+    ],
+)

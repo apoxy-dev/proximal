@@ -16,6 +16,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 
+	envoyrunner "github.com/apoxy-dev/proximal/core/envoy"
 	"github.com/apoxy-dev/proximal/core/log"
 	"github.com/apoxy-dev/proximal/core/server"
 	"github.com/apoxy-dev/proximal/server/api"
@@ -139,10 +140,10 @@ func main() {
 		}
 	}()
 
-	e := &envoy.Runtime{
+	e := &envoyrunner.Runtime{
 		EnvoyPath:           *envoyPath,
 		BootstrapConfigPath: "./cmd/server/envoy-bootstrap.yaml",
-		Release: &envoy.Release{
+		Release: &envoyrunner.Release{
 			Version: "v1.26.3",
 		},
 	}
