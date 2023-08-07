@@ -58,6 +58,8 @@ type Runtime struct {
 	EnvoyPath           string
 	BootstrapConfigPath string
 	Release             *Release
+
+	cmd *exec.Cmd
 }
 
 func (r *Runtime) run(ctx context.Context) error {
@@ -67,16 +69,16 @@ func (r *Runtime) run(ctx context.Context) error {
 		"-c", r.BootstrapConfigPath,
 		"--config-yaml", fmt.Sprintf(`node: { id: "%s", cluster: "proximal" }`, id),
 	}
-	cmd := exec.CommandContext(ctx, r.envoyPath(), args...)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
+	r.cmd = exec.CommandContext(ctx, r.envoyPath(), args...)
+	r.cmd.Stdout = os.Stdout
+	r.cmd.Stderr = os.Stderr
 
-	if err := cmd.Start(); err != nil {
+	if err := r.cmd.Start(); err != nil {
 		return fmt.Errorf("failed to start envoy: %w", err)
 	}
 
 	// Restart envoy if it exits.
-	if err := cmd.Wait(); err != nil {
+	if err := r.cmd.Wait(); err != nil {
 		return fmt.Errorf("envoy exited with error: %w", err)
 	}
 
@@ -162,4 +164,12 @@ func (r *Runtime) Run(ctx context.Context) error {
 	}
 
 	return nil
+}
+
+// Stop stops the Envoy process.
+func (r *Runtime) Stop() error {
+	if r.cmd == nil {
+		return nil
+	}
+	return r.cmd.Process.Kill()
 }
