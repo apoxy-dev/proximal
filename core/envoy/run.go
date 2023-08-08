@@ -59,24 +59,30 @@ type Runtime struct {
 	BootstrapConfigPath string
 	BootstrapConfigYAML string
 	Release             *Release
+	// Args are additional arguments to pass to Envoy.
+	Args []string
 
 	cmd *exec.Cmd
 }
 
 func (r *Runtime) run(ctx context.Context) error {
 	id := uuid.New().String()
-	log.Infof("running envoy withe node: { id: %s }", id)
 	configYAML := fmt.Sprintf(`node: { id: "%s", cluster: "proximal" }`, id)
 	if r.BootstrapConfigYAML != "" {
-		log.Infof("using bootstrap config:\n%s", r.BootstrapConfigYAML)
 		configYAML = r.BootstrapConfigYAML
 	}
+	log.Infof("envoy YAML config: %s", configYAML)
+
 	args := []string{
 		"--config-yaml", configYAML,
 	}
+
 	if r.BootstrapConfigPath != "" {
 		args = append(args, "-c", r.BootstrapConfigPath)
 	}
+
+	args = append(args, r.Args...)
+
 	r.cmd = exec.CommandContext(ctx, r.envoyPath(), args...)
 	r.cmd.Stdout = os.Stdout
 	r.cmd.Stderr = os.Stderr
